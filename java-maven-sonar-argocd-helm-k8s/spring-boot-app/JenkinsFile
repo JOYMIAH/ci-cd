@@ -47,17 +47,18 @@ pipeline {
             environment {
                 GIT_REPO_NAME = "ci-cd"
                 GIT_USER_NAME = "JOYMIAH"
+                DOCKER_IMAGE_TAG = "${BUILD_NUMBER}"
             }
             steps {
                 withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                    sh '''
+                    sh """
                         git config user.email "joy15-4108@diu.edu.bd"
                         git config user.name "JOYMIAH"
-                        sed -i "s/joymiah1\/ultimate-cicd:[0-9]*/joymiah1\/ultimate-cicd:${BUILD_NUMBER}/" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+                        sed -i 's|joymiah1/ultimate-cicd:[0-9]*|joymiah1/ultimate-cicd:${DOCKER_IMAGE_TAG}|' java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
                         git add java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
-                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git commit -m "Update deployment image to version ${DOCKER_IMAGE_TAG}"
                         git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                    '''
+                    """
                 }
             }
         }
